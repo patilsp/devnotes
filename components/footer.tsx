@@ -1,24 +1,63 @@
-import Image from "next/image";
 import Link from "next/link";
+import { DevNotesLogo, DevNotesWordmark } from "./logo";
+
+const footerLinks = [
+  {
+    heading: "Product",
+    links: [
+      { label: "Features", href: "#features" },
+      { label: "Workflow", href: "#workflow" },
+      { label: "FAQ", href: "#faq" },
+    ],
+  },
+  {
+    heading: "Account",
+    links: [
+      { label: "Login", href: "/login" },
+      { label: "Sign Up", href: "/signup" },
+      { label: "Dashboard", href: "/dashboard" },
+    ],
+  },
+];
 
 export default function Footer() {
   return (
-    <footer className="py-16 md:py-32">
+    <footer className="border-t py-16">
       <div className="mx-auto max-w-5xl px-6">
-        <Link
-          href="/"
-          aria-label="go home"
-          className="mx-auto size-fit flex items-center gap-2"
-        >
-          <Image src="/noteforge-logo.png" alt="logo" width={60} height={60} />
+        <div className="grid gap-10 md:grid-cols-[1fr_auto_auto] md:gap-20">
+          <div>
+            <Link href="/" aria-label="DevNotes home" className="flex items-center gap-2">
+              <DevNotesLogo />
+              <DevNotesWordmark />
+            </Link>
+            <p className="text-muted-foreground mt-4 max-w-xs text-sm">
+              The developer notebook for capturing snippets, decisions, and
+              docs — organized in notebooks that scale with you.
+            </p>
+          </div>
 
-          <span className="text-2xl font-bold">Noteforge</span>
-        </Link>
+          {footerLinks.map((column) => (
+            <div key={column.heading}>
+              <h3 className="text-sm font-semibold">{column.heading}</h3>
+              <ul className="mt-4 space-y-3">
+                {column.links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-muted-foreground text-sm transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
 
-        <span className="text-muted-foreground block text-center text-sm">
-          {" "}
-          © {new Date().getFullYear()} NoteForge, All rights reserved
-        </span>
+        <div className="text-muted-foreground mt-12 border-t pt-6 text-center text-sm">
+          © {new Date().getFullYear()} DevNotes. All rights reserved.
+        </div>
       </div>
     </footer>
   );

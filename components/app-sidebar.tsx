@@ -9,9 +9,9 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { getNotebooks } from "@/server/notebooks";
-import Image from "next/image";
 import { SidebarData } from "./sidebar-data";
 import Link from "next/link";
+import { DevNotesLogo, DevNotesWordmark } from "./logo";
 
 export async function AppSidebar({
   ...props
@@ -36,8 +36,8 @@ export async function AppSidebar({
     <Sidebar {...props}>
       <SidebarHeader>
         <Link href="/dashboard" className="flex items-center gap-2 pl-2">
-          <Image src="/noteforge-logo.png" alt="Logo" width={32} height={32} />
-          <h2>NoteForge</h2>
+          <DevNotesLogo />
+          <DevNotesWordmark className="text-xl" />
         </Link>
 
         <React.Suspense>
