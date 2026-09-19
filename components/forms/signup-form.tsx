@@ -66,6 +66,7 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -105,11 +106,19 @@ export function SignupForm({
     }
   }
 
-  const signUp = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/dashboard",
-    });
+  const signUpWithGoogle = async () => {
+    try {
+      setIsGoogleLoading(true);
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/dashboard",
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to start Google sign up");
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
@@ -198,7 +207,11 @@ export function SignupForm({
                   />
                 </div>
                 <div className="flex flex-col gap-3">
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading || isGoogleLoading}
+                  >
                     {isLoading ? (
                       <Loader2 className="size-4 animate-spin" />
                     ) : (
@@ -208,10 +221,15 @@ export function SignupForm({
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={signUp}
+                    onClick={signUpWithGoogle}
                     type="button"
+                    disabled={isLoading || isGoogleLoading}
                   >
-                    <GoogleIcon />
+                    {isGoogleLoading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <GoogleIcon />
+                    )}
                     Continue with Google
                   </Button>
                 </div>

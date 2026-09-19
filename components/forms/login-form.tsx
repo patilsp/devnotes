@@ -65,6 +65,7 @@ export function LoginForm({
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -73,11 +74,19 @@ export function LoginForm({
     },
   });
 
-  const signIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/dashboard",
-    });
+  const signInWithGoogle = async () => {
+    try {
+      setIsGoogleLoading(true);
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/dashboard",
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to start Google sign in");
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -87,6 +96,7 @@ export function LoginForm({
       if (response.success) {
         toast.success(response.message);
         router.push("/dashboard");
+        router.refresh();
       } else {
         toast.error(response.message);
       }
@@ -157,7 +167,11 @@ export function LoginForm({
                   />
                 </div>
                 <div className="flex flex-col gap-3">
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading || isGoogleLoading}
+                  >
                     {isLoading ? (
                       <Loader2 className="size-4 animate-spin" />
                     ) : (
@@ -167,10 +181,15 @@ export function LoginForm({
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={signIn}
+                    onClick={signInWithGoogle}
                     type="button"
+                    disabled={isLoading || isGoogleLoading}
                   >
-                    <GoogleIcon />
+                    {isGoogleLoading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <GoogleIcon />
+                    )}
                     Continue with Google
                   </Button>
                 </div>
