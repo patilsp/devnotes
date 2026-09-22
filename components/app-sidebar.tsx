@@ -23,7 +23,7 @@ export async function AppSidebar({
     navMain: [
       ...(notebooks.notebooks?.map((notebook) => ({
         title: notebook.name,
-        url: `/dashboard/${notebook.id}`,
+        url: `/dashboard/notebook/${notebook.id}`,
         items: notebook.notes.map((note) => ({
           title: note.title,
           url: `/dashboard/notebook/${notebook.id}/note/${note.id}`,

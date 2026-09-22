@@ -2,6 +2,7 @@ import { PageWrapper } from "@/components/page-wrapper";
 import RichTextEditor from "@/components/rich-text-editor";
 import { getNoteById } from "@/server/notes";
 import { JSONContent } from "@tiptap/react";
+import { notFound } from "next/navigation";
 
 type Params = Promise<{
   noteId: string;
@@ -10,7 +11,9 @@ type Params = Promise<{
 export default async function NotePage({ params }: { params: Params }) {
   const { noteId } = await params;
 
-  const { note } = await getNoteById(noteId);
+  const { success, note } = await getNoteById(noteId);
+
+  if (success && !note) notFound();
 
   return (
     <PageWrapper

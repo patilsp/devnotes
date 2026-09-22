@@ -5,13 +5,17 @@ import { InsertNotebook, notebooks } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { actionError } from "./action-error";
 
 export const createNotebook = async (values: InsertNotebook) => {
     try {
         await db.insert(notebooks).values(values);
         return { success: true, message: "Notebook created successfully" };
-    } catch {
-        return { success: false, message: "Failed to create notebook" };
+    } catch (error) {
+        return {
+            success: false,
+            message: actionError("createNotebook", error, "Failed to create notebook"),
+        };
     }
 };
 
@@ -35,8 +39,11 @@ export const getNotebooks = async () => {
         });
 
         return { success: true, notebooks: notebooksByUser };
-    } catch {
-        return { success: false, message: "Failed to get notebooks" };
+    } catch (error) {
+        return {
+            success: false,
+            message: actionError("getNotebooks", error, "Failed to get notebooks"),
+        };
     }
 };
 
@@ -50,8 +57,11 @@ export const getNotebookById = async (id: string) => {
         });
 
         return { success: true, notebook };
-    } catch {
-        return { success: false, message: "Failed to get notebook" };
+    } catch (error) {
+        return {
+            success: false,
+            message: actionError("getNotebookById", error, "Failed to get notebook"),
+        };
     }
 };
 
@@ -59,8 +69,11 @@ export const updateNotebook = async (id: string, values: InsertNotebook) => {
     try {
         await db.update(notebooks).set(values).where(eq(notebooks.id, id));
         return { success: true, message: "Notebook updated successfully" };
-    } catch {
-        return { success: false, message: "Failed to update notebook" };
+    } catch (error) {
+        return {
+            success: false,
+            message: actionError("updateNotebook", error, "Failed to update notebook"),
+        };
     }
 };
 
@@ -68,7 +81,10 @@ export const deleteNotebook = async (id: string) => {
     try {
         await db.delete(notebooks).where(eq(notebooks.id, id));
         return { success: true, message: "Notebook deleted successfully" };
-    } catch {
-        return { success: false, message: "Failed to delete notebook" };
+    } catch (error) {
+        return {
+            success: false,
+            message: actionError("deleteNotebook", error, "Failed to delete notebook"),
+        };
     }
 };

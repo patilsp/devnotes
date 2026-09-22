@@ -2,6 +2,7 @@ import { CreateNoteButton } from "@/components/create-note-button";
 import NoteCard from "@/components/note-card";
 import { PageWrapper } from "@/components/page-wrapper";
 import { getNotebookById } from "@/server/notebooks";
+import { notFound } from "next/navigation";
 
 type Params = Promise<{
   notebookId: string;
@@ -10,7 +11,11 @@ type Params = Promise<{
 export default async function NotebookPage({ params }: { params: Params }) {
   const { notebookId } = await params;
 
-  const { notebook } = await getNotebookById(notebookId);
+  const { success, notebook } = await getNotebookById(notebookId);
+
+  // A deleted (or bad) id should 404 instead of rendering an empty shell with a
+  // "Create Note" button that can never succeed.
+  if (success && !notebook) notFound();
 
   return (
     <PageWrapper
