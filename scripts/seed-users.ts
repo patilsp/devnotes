@@ -1,11 +1,16 @@
 /**
- * Seeds the default admin and developer accounts.
+ * Seeds the dummy admin account.
  *
- * Usage: pnpm db:seed
+ * Usage:
+ *   pnpm db:seed             # upsert admin@gmail.com (idempotent)
+ *   pnpm db:reset            # delete every existing user first, then seed
  *
  * Idempotent: safe to run multiple times. Refreshes the password if the user
- * already exists, and marks accounts email-verified so they can log in
+ * already exists, and marks the account email-verified so it can log in
  * without an email verification step.
+ *
+ * `--reset` cascades: deleting a user also removes its sessions, credential
+ * accounts, notebooks, and notes.
  */
 import { hashPassword } from "better-auth/crypto";
 import { drizzle } from "drizzle-orm/neon-http";
@@ -25,12 +30,26 @@ if (!DATABASE_URL) {
 }
 
 const SEED_USERS = [
-  { email: "admin@devnotes.app", name: "Admin", password: "Password@123" },
-  { email: "developer@devnotes.app", name: "Developer", password: "Password@123" },
+  { email: "admin@gmail.com", name: "Admin", password: "Password@01" },
 ];
+
+// better-auth 1.7 scopes account identities by issuer.
+const CREDENTIAL_ISSUER = "local:credential";
+
+const reset = process.argv.includes("--reset");
 
 async function seed() {
   const db = drizzle(DATABASE_URL!);
+
+  if (reset) {
+    console.log(
+      "Deleting all existing users (sessions, credential accounts, notebooks and notes cascade)..."
+    );
+    const deleted = await db.delete(user).returning({ email: user.email });
+    console.log(
+      `Deleted ${deleted.length} user(s): ${deleted.map((u) => u.email).join(", ") || "(none)"}\n`
+    );
+  }
 
   for (const seedUser of SEED_USERS) {
     const hashedPassword = await hashPassword(seedUser.password);
@@ -78,6 +97,7 @@ async function seed() {
           password: hashedPassword,
           accountId: userId,
           providerId: "credential",
+          issuer: CREDENTIAL_ISSUER,
           updatedAt: new Date(),
         })
         .where(eq(account.id, existingAccount.id));
@@ -88,6 +108,7 @@ async function seed() {
         userId,
         accountId: userId,
         providerId: "credential",
+        issuer: CREDENTIAL_ISSUER,
         password: hashedPassword,
         createdAt: new Date(),
         updatedAt: new Date(),

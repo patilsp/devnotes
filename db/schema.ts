@@ -34,6 +34,11 @@ export const account = pgTable("account", {
     refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
     scope: text('scope'),
     password: text('password'),
+    // Required by better-auth 1.7+ (account identity is scoped by issuer).
+    // Without it sign-up fails with `The field "issuer" does not exist in the
+    // "account" Drizzle schema`, so the credential account is never created
+    // and every login fails.
+    issuer: text('issuer').notNull(),
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull()
 });

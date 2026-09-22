@@ -24,6 +24,14 @@ function getEmailClient(): Resend | null {
   return resend;
 }
 
+// Sender address for verification/reset emails. Falls back to Resend's shared
+// test sender, which can only deliver to the Resend account owner.
+const emailFrom = process.env.EMAIL_FROM
+  ? process.env.EMAIL_FROM.includes("<")
+    ? process.env.EMAIL_FROM
+    : `DevNotes <${process.env.EMAIL_FROM}>`
+  : "DevNotes <onboarding@resend.dev>";
+
 // Public origin of the app (no trailing slash). Used for OAuth redirects,
 // email verification links, and password reset links.
 const baseURL = (
@@ -43,12 +51,22 @@ export const auth = betterAuth({
         );
         return;
       }
-      await client.emails.send({
-        from: "DevNotes <onboarding@resend.dev>",
-        to: [user.email],
-        subject: "Verify your email address",
-        react: VerificationEmail({ userName: user.name, verificationUrl: url }),
-      });
+      try {
+        const result = await client.emails.send({
+          from: emailFrom,
+          to: [user.email],
+          subject: "Verify your email address",
+          react: VerificationEmail({ userName: user.name, verificationUrl: url }),
+        });
+        if (result.error) {
+          console.warn(
+            `[auth] Verification email to ${user.email} was rejected: ${result.error.message}`
+          );
+        }
+      } catch (error) {
+        // Never let a mail failure block sign-up.
+        console.error(`[auth] Failed to send verification email to ${user.email}`, error);
+      }
     },
     sendOnSignUp: true,
   },
@@ -68,16 +86,25 @@ export const auth = betterAuth({
         );
         return;
       }
-      await client.emails.send({
-        from: "DevNotes <onboarding@resend.dev>",
-        to: [user.email],
-        subject: "Reset your password",
-        react: PasswordResetEmail({
-          userName: user.name,
-          resetUrl: url,
-          requestTime: new Date().toLocaleString(),
-        }),
-      });
+      try {
+        const result = await client.emails.send({
+          from: emailFrom,
+          to: [user.email],
+          subject: "Reset your password",
+          react: PasswordResetEmail({
+            userName: user.name,
+            resetUrl: url,
+            requestTime: new Date().toLocaleString(),
+          }),
+        });
+        if (result.error) {
+          console.warn(
+            `[auth] Password reset email to ${user.email} was rejected: ${result.error.message}`
+          );
+        }
+      } catch (error) {
+        console.error(`[auth] Failed to send reset email to ${user.email}`, error);
+      }
     },
   },
   database: drizzleAdapter(db, {
