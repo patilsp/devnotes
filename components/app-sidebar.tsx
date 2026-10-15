@@ -5,6 +5,7 @@ import { SearchForm } from "@/components/search-form";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
@@ -19,7 +20,6 @@ export async function AppSidebar({
   const notebooks = await getNotebooks();
 
   const data = {
-    versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
     navMain: [
       ...(notebooks.notebooks?.map((notebook) => ({
         title: notebook.name,
@@ -34,8 +34,8 @@ export async function AppSidebar({
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader>
-        <Link href="/dashboard" className="flex items-center gap-2 pl-2">
+      <SidebarHeader className="p-3">
+        <Link href="/dashboard" className="flex items-center gap-2 pl-1 py-1">
           <DevNotesLogo />
           <DevNotesWordmark className="text-xl" />
         </Link>
@@ -44,9 +44,23 @@ export async function AppSidebar({
           <SearchForm />
         </React.Suspense>
       </SidebarHeader>
-      <SidebarContent className="gap-0">
+
+      <SidebarContent className="gap-0 px-1">
         <SidebarData data={data} />
       </SidebarContent>
+
+      <SidebarFooter className="border-t p-2.5">
+        <Link
+          href="/dashboard"
+          className="flex items-center justify-between text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1.5 rounded-md hover:bg-sidebar-accent"
+        >
+          <span className="font-medium">Command Palette</span>
+          <kbd className="rounded border bg-muted/80 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
+            Ctrl+K
+          </kbd>
+        </Link>
+      </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );

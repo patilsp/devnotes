@@ -30,18 +30,9 @@ import {
   Code2,
   Terminal,
   Sparkles,
-  Underline,
-  Link,
   List,
   ListOrdered,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
-  Plus,
   ChevronDown,
-  Superscript,
-  Subscript,
 } from "lucide-react";
 import { updateNote } from "@/server/notes";
 import { AIAssistantModal } from "@/components/ai-assistant-modal";
@@ -429,94 +420,22 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
           </DropdownMenu>
         )}
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
-        >
-          <Underline className="h-4 w-4" />
-        </Button>
-
-        <div className="w-px h-6 bg-border mx-1" />
-
-        {/* Additional Tools */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
-        >
-          <Link className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
-        >
-          <Superscript className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
-        >
-          <Subscript className="h-4 w-4" />
-        </Button>
-
-        <div className="w-px h-6 bg-border mx-1" />
-
-        {/* Alignment */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
-        >
-          <AlignLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
-        >
-          <AlignCenter className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
-        >
-          <AlignRight className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
-        >
-          <AlignJustify className="h-4 w-4" />
-        </Button>
-
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Ask AI Button */}
+        {/* Ask AI Assistant */}
         <Button
           variant="outline"
           size="sm"
           onClick={openAIAssistant}
-          className="h-8 px-2.5 text-xs font-medium gap-1.5 border-primary/30 text-primary hover:bg-primary/10 shadow-xs"
+          className="h-8 px-2.5 text-xs font-medium gap-1.5 border-primary/30 text-primary hover:bg-primary/10 shadow-2xs"
           title="Ask DevNotes AI Assistant (Ctrl+J)"
         >
           <Sparkles className="size-3.5 text-primary" />
-          Ask AI
-        </Button>
-
-        {/* Add Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2 text-muted-foreground hover:text-foreground hover:bg-accent gap-1"
-        >
-          <Plus className="h-4 w-4" />
-          Add
+          <span>Ask AI</span>
+          <kbd className="hidden sm:inline-block rounded border bg-muted/80 px-1 text-[9px] text-muted-foreground">
+            Ctrl+J
+          </kbd>
         </Button>
       </div>
 

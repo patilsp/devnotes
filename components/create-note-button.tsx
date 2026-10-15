@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createNote } from "@/server/notes";
 
@@ -74,13 +74,16 @@ export const CreateNoteButton = ({ notebookId }: { notebookId: string }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-max">Create Note</Button>
+        <Button className="gap-1.5 h-9 font-medium shadow-xs">
+          <Plus className="size-4" />
+          <span>New Note</span>
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Note</DialogTitle>
           <DialogDescription>
-            Create a new note to store your notes.
+            Add a new note to this notebook for capturing documentation, architecture decisions, or snippets.
           </DialogDescription>
         </DialogHeader>
 

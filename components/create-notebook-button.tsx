@@ -27,7 +27,7 @@ import { createNotebook } from "@/server/notebooks";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
@@ -79,7 +79,10 @@ export const CreateNotebookButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-max">Create Notebook</Button>
+        <Button className="gap-1.5 h-9 font-medium shadow-xs">
+          <Plus className="size-4" />
+          <span>New Notebook</span>
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
