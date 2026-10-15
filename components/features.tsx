@@ -53,39 +53,40 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="scroll-mt-20 bg-zinc-50 py-16 md:py-32 dark:bg-transparent">
-      <div className="@container mx-auto max-w-5xl px-6">
+    <section id="features" className="scroll-mt-20 bg-zinc-50/70 py-16 md:py-28 dark:bg-zinc-950/30 border-y border-border/40">
+      <div className="mx-auto max-w-5xl px-6">
         <div className="text-center">
-          <span className="text-primary text-sm font-semibold tracking-widest uppercase">
+          <span className="text-primary text-xs sm:text-sm font-semibold tracking-widest uppercase">
             Features
           </span>
-          <h2 className="mt-3 text-balance text-4xl font-semibold lg:text-5xl">
+          <h2 className="mt-3 text-balance text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
             Built for how <span className="text-gradient-brand">developers</span> actually work
           </h2>
-          <p className="text-muted-foreground mx-auto mt-4 max-w-2xl">
+          <p className="text-muted-foreground mx-auto mt-4 max-w-2xl text-sm sm:text-base leading-relaxed">
             Smart, flexible, and fast — DevNotes gives you everything you need to
             build a second brain that speaks your language.
           </p>
         </div>
 
-        <div className="@min-4xl:grid-cols-3 mx-auto mt-8 grid max-w-sm gap-6 *:text-center md:mt-16 @min-4xl:max-w-full">
+        <div className="mx-auto mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:mt-16">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.4, delay: index * 0.06, ease: "easeOut" }}
+              className="h-full"
             >
-              <Card className="group bg-background h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <CardHeader className="pb-3">
-                  <div className="bg-primary/10 ring-primary/15 mx-auto mb-4 flex size-12 items-center justify-center rounded-xl ring-1 transition-colors duration-300 group-hover:bg-primary group-hover:ring-primary">
-                    <feature.icon className="text-primary size-6 transition-colors duration-300 group-hover:text-primary-foreground" />
+              <Card className="group bg-card h-full transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-primary/30 text-center flex flex-col justify-between">
+                <CardHeader className="pb-2 pt-6">
+                  <div className="bg-primary/10 ring-primary/15 mx-auto mb-4 flex size-12 items-center justify-center rounded-xl ring-1 transition-colors duration-200 group-hover:bg-primary group-hover:ring-primary">
+                    <feature.icon className="text-primary size-5 sm:size-6 transition-colors duration-200 group-hover:text-primary-foreground" />
                   </div>
-                  <h3 className="font-medium">{feature.title}</h3>
+                  <h3 className="font-semibold text-base tracking-tight">{feature.title}</h3>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm">{feature.description}</p>
+                <CardContent className="pb-6">
+                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             </motion.div>

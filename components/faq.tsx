@@ -25,13 +25,13 @@ const faqs = [
 
 export default function Faq() {
   return (
-    <section id="faq" className="scroll-mt-20 bg-zinc-50 py-16 md:py-32 dark:bg-transparent">
+    <section id="faq" className="scroll-mt-20 bg-zinc-50/70 py-16 md:py-28 dark:bg-zinc-950/30 border-t border-border/40">
       <div className="mx-auto max-w-3xl px-6">
         <div className="text-center">
-          <span className="text-primary text-sm font-semibold tracking-widest uppercase">
+          <span className="text-primary text-xs sm:text-sm font-semibold tracking-widest uppercase">
             FAQ
           </span>
-          <h2 className="mt-3 text-balance text-4xl font-semibold lg:text-5xl">
+          <h2 className="mt-3 text-balance text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
             Questions, answered
           </h2>
         </div>
@@ -40,13 +40,13 @@ export default function Faq() {
           {faqs.map((faq) => (
             <details
               key={faq.question}
-              className="group bg-card rounded-xl border shadow-xs transition-shadow open:shadow-md"
+              className="group bg-card rounded-xl border shadow-xs transition-all duration-200 open:shadow-md hover:border-primary/30"
             >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 font-medium [&::-webkit-details-marker]:hidden">
-                {faq.question}
-                <ChevronDown className="text-muted-foreground size-5 shrink-0 transition-transform duration-200 group-open:rotate-180" />
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 sm:p-5 font-medium [&::-webkit-details-marker]:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-xl text-sm sm:text-base">
+                <span>{faq.question}</span>
+                <ChevronDown className="text-muted-foreground size-4 sm:size-5 shrink-0 transition-transform duration-200 group-open:rotate-180" />
               </summary>
-              <p className="text-muted-foreground px-5 pb-5 text-sm leading-relaxed">
+              <p className="text-muted-foreground px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm leading-relaxed">
                 {faq.answer}
               </p>
             </details>

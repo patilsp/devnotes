@@ -140,6 +140,27 @@ export function CommandPalette() {
         {/* Quick Actions */}
         <CommandGroup heading="Actions">
           <CommandItem
+            value="ask ai assistant code generate explain"
+            onSelect={() =>
+              runCommand(() => {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(
+                    new KeyboardEvent("keydown", {
+                      key: "j",
+                      ctrlKey: true,
+                      bubbles: true,
+                    })
+                  );
+                }
+              })
+            }
+          >
+            <Sparkles className="mr-2 h-4 w-4 text-primary" />
+            <span>Ask DevNotes AI Assistant</span>
+            <CommandShortcut>Ctrl+J</CommandShortcut>
+          </CommandItem>
+
+          <CommandItem
             value="go to dashboard home"
             onSelect={() => runCommand(() => router.push("/dashboard"))}
           >

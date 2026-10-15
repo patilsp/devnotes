@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   useEditor,
   EditorContent,
@@ -28,6 +29,7 @@ import {
   Code,
   Code2,
   Terminal,
+  Sparkles,
   Underline,
   Link,
   List,
@@ -42,6 +44,7 @@ import {
   Subscript,
 } from "lucide-react";
 import { updateNote } from "@/server/notes";
+import { AIAssistantModal } from "@/components/ai-assistant-modal";
 
 const lowlight = createLowlight(common);
 
@@ -65,6 +68,9 @@ interface RichTextEditorProps {
 }
 
 const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
+  const [aiOpen, setAiOpen] = useState(false);
+  const [selectedText, setSelectedText] = useState("");
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -191,6 +197,35 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
     if (editorState?.isHeading3) return "H3";
     return "H1";
   };
+
+  const openAIAssistant = () => {
+    if (editor) {
+      const { from, to } = editor.state.selection;
+      const selected = from !== to ? editor.state.doc.textBetween(from, to, " ") : "";
+      setSelectedText(selected);
+    }
+    setAiOpen(true);
+  };
+
+  const handleAIInsert = (text: string, replaceSelection?: boolean) => {
+    if (!editor) return;
+    if (replaceSelection) {
+      editor.chain().focus().insertContent(text).run();
+    } else {
+      editor.chain().focus().insertContent(`\n${text}\n`).run();
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "j" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        openAIAssistant();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [editor]);
 
   return (
     <div className="w-full max-w-7xl bg-card text-card-foreground rounded-lg overflow-hidden border">
@@ -462,6 +497,18 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         {/* Spacer */}
         <div className="flex-1" />
 
+        {/* Ask AI Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={openAIAssistant}
+          className="h-8 px-2.5 text-xs font-medium gap-1.5 border-primary/30 text-primary hover:bg-primary/10 shadow-xs"
+          title="Ask DevNotes AI Assistant (Ctrl+J)"
+        >
+          <Sparkles className="size-3.5 text-primary" />
+          Ask AI
+        </Button>
+
         {/* Add Button */}
         <Button
           variant="ghost"
@@ -480,6 +527,15 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
           className="prose prose-neutral dark:prose-invert max-w-none focus:outline-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-96 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_p]:mb-4 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_code]:bg-muted [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded"
         />
       </div>
+
+      {/* AI Assistant Modal */}
+      <AIAssistantModal
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        selectedText={selectedText}
+        fullNoteText={editor?.getText() || ""}
+        onInsert={handleAIInsert}
+      />
     </div>
   );
 };

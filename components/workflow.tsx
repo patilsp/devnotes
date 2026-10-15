@@ -32,15 +32,15 @@ export default function Workflow() {
     <section id="workflow" className="scroll-mt-20 py-16 md:py-32">
       <div className="mx-auto max-w-5xl px-6">
         <div className="text-center">
-          <span className="text-primary text-sm font-semibold tracking-widest uppercase">
+          <span className="text-primary text-xs sm:text-sm font-semibold tracking-widest uppercase">
             Workflow
           </span>
-          <h2 className="mt-3 text-balance text-4xl font-semibold lg:text-5xl">
+          <h2 className="mt-3 text-balance text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
             From spark to <span className="text-gradient-brand">shipped</span> in three steps
           </h2>
         </div>
 
-        <div className="relative mt-8 grid gap-10 md:mt-20 md:grid-cols-3 md:gap-8">
+        <div className="relative mt-10 grid gap-8 sm:gap-10 md:mt-20 md:grid-cols-3 md:gap-8">
           {/* Connector line (desktop) */}
           <div
             aria-hidden

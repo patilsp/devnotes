@@ -24,7 +24,7 @@ export default function Footer() {
   return (
     <footer className="border-t py-16">
       <div className="mx-auto max-w-5xl px-6">
-        <div className="grid gap-10 md:grid-cols-[1fr_auto_auto] md:gap-20">
+        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-[1fr_auto_auto] md:gap-16 lg:gap-20">
           <div>
             <Link href="/" aria-label="DevNotes home" className="flex items-center gap-2">
               <DevNotesLogo />
