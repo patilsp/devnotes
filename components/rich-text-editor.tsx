@@ -36,10 +36,14 @@ import {
 } from "lucide-react";
 import { updateNote } from "@/server/notes";
 import { AIAssistantModal } from "@/components/ai-assistant-modal";
+import { MermaidViewer } from "@/components/mermaid-viewer";
+import { SlashCommandMenu } from "@/components/slash-command-menu";
+import { Workflow, Eye, Edit3 } from "lucide-react";
 
 const lowlight = createLowlight(common);
 
 const SUPPORTED_LANGUAGES = [
+  { label: "Mermaid Diagram", value: "mermaid" },
   { label: "TypeScript", value: "typescript" },
   { label: "JavaScript", value: "javascript" },
   { label: "Python", value: "python" },
@@ -205,6 +209,40 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
     } else {
       editor.chain().focus().insertContent(`\n${text}\n`).run();
     }
+  };
+
+  const insertMermaidDiagram = () => {
+    if (!editor) return;
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "codeBlock",
+        attrs: { language: "mermaid" },
+        content: [
+          {
+            type: "text",
+            text: `graph TD\n  Client[Web / Mobile Client] -->|HTTPS / API| Gateway[API Gateway]\n  Gateway --> Auth[Better Auth Service]\n  Gateway --> DB[(Neon Postgres)]\n  Gateway --> Cache[(Redis Cache)]`,
+          },
+        ],
+      })
+      .run();
+  };
+
+  // Inspect if current selection is inside a mermaid codeBlock
+  const currentLanguage = editorState?.isCodeBlock
+    ? editor?.getAttributes("codeBlock").language
+    : null;
+  const isMermaidBlock = currentLanguage === "mermaid";
+
+  // Extract mermaid code from current block if inside one
+  const getMermaidCode = () => {
+    if (!editor || !isMermaidBlock) return "";
+    const { $from } = editor.state.selection;
+    if ($from.parent.type.name === "codeBlock") {
+      return $from.parent.textContent;
+    }
+    return "";
   };
 
   useEffect(() => {
@@ -420,6 +458,17 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
           </DropdownMenu>
         )}
 
+        {/* Insert Diagram Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={insertMermaidDiagram}
+          className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+          title="Insert Mermaid Architecture Diagram (/diagram)"
+        >
+          <Workflow className="h-4 w-4 text-primary" />
+        </Button>
+
         {/* Spacer */}
         <div className="flex-1" />
 
@@ -429,7 +478,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
           size="sm"
           onClick={openAIAssistant}
           className="h-8 px-2.5 text-xs font-medium gap-1.5 border-primary/30 text-primary hover:bg-primary/10 shadow-2xs"
-          title="Ask DevNotes AI Assistant (Ctrl+J)"
+          title="Ask DevNotes AI Assistant (Ctrl+J or type /)"
         >
           <Sparkles className="size-3.5 text-primary" />
           <span>Ask AI</span>
@@ -439,13 +488,27 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         </Button>
       </div>
 
-      {/* Editor Content */}
-      <div className="min-h-96 p-6 bg-card">
+      {/* Editor Content Area with Relative Positioning for Slash Command Menu */}
+      <div className="relative min-h-96 p-6 bg-card">
         <EditorContent
           editor={editor}
           className="prose prose-neutral dark:prose-invert max-w-none focus:outline-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-96 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_p]:mb-4 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_code]:bg-muted [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded"
         />
+
+        {/* Interactive Slash Command Menu */}
+        <SlashCommandMenu editor={editor} onOpenAI={openAIAssistant} />
       </div>
+
+      {/* Live Diagram Visualizer when cursor is inside a Mermaid block */}
+      {isMermaidBlock && getMermaidCode() && (
+        <div className="border-t bg-muted/20 p-4">
+          <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-muted-foreground">
+            <Eye className="size-3.5 text-primary" />
+            <span>Live Mermaid Diagram Preview (Updates as you type)</span>
+          </div>
+          <MermaidViewer chart={getMermaidCode()} />
+        </div>
+      )}
 
       {/* AI Assistant Modal */}
       <AIAssistantModal

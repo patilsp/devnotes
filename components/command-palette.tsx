@@ -140,6 +140,24 @@ export function CommandPalette() {
         {/* Quick Actions */}
         <CommandGroup heading="Actions">
           <CommandItem
+            value="chat with your notes rag semantic search ai copilot"
+            onSelect={() =>
+              runCommand(() => {
+                if (typeof window !== "undefined") {
+                  window.dispatchEvent(new CustomEvent("open-chat-notes"));
+                }
+              })
+            }
+          >
+            <Sparkles className="mr-2 h-4 w-4 text-primary" />
+            <div className="flex items-center gap-1.5 flex-1">
+              <span>Chat with Your Notes (RAG Copilot)</span>
+              <span className="text-[10px] font-mono px-1 rounded bg-primary/10 text-primary">NEW</span>
+            </div>
+            <CommandShortcut>Ctrl+Shift+K</CommandShortcut>
+          </CommandItem>
+
+          <CommandItem
             value="ask ai assistant code generate explain"
             onSelect={() =>
               runCommand(() => {

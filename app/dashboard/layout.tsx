@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { CommandPalette } from "@/components/command-palette";
+import { ChatNotesListener } from "@/components/chat-notes-listener";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SidebarSkeleton } from "@/components/skeletons/sidebar-skeleton";
 import { auth } from "@/lib/auth";
@@ -24,6 +25,7 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider>
       <CommandPalette />
+      <ChatNotesListener />
       <Suspense fallback={<SidebarSkeleton />}>
         <AppSidebar />
       </Suspense>

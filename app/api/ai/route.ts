@@ -40,6 +40,12 @@ Keep explanations concise, direct, and actionable for developers. Avoid unnecess
       instruction = `Provide a concise bulleted summary and key takeaways for the following note content:\n\n${context}`;
     } else if (command === "translate") {
       instruction = `Convert the following code snippet to ${language}. Ensure idiomatic patterns and correct typing:\n\n${context}`;
+    } else if (command === "diagram") {
+      instruction = `Generate a valid, syntax-clean Mermaid.js diagram (e.g. flowchart TD, sequenceDiagram, erDiagram, classDiagram, stateDiagram) representing the requested architecture, system design, or data flow:
+${prompt || "Create an architecture flow diagram"}
+${context ? `Based on this context:\n${context}` : ""}
+
+CRITICAL: Return ONLY valid Mermaid diagram syntax enclosed in \`\`\`mermaid\n...\n\`\`\`. Do not include conversational markdown around it.`;
     } else if (context) {
       instruction = `Context from current note:\n"""\n${context}\n"""\n\nTask: ${prompt}`;
     }
@@ -65,7 +71,17 @@ Keep explanations concise, direct, and actionable for developers. Avoid unnecess
     } else {
       // Smart offline fallback when neither key is configured yet
       let simulatedResponse = "";
-      if (command === "explain") {
+      if (command === "diagram") {
+        simulatedResponse = `\`\`\`mermaid
+flowchart TD
+  Client[Client Browser / App] -->|HTTPS Request| Proxy[Next.js Proxy / Middleware]
+  Proxy -->|Session Check| Auth[Better Auth Engine]
+  Proxy -->|Authenticated| App[Dashboard & Note Engine]
+  App -->|Drizzle ORM| Neon[(Neon Serverless Postgres)]
+  App -->|AI Assistant| AI[Vercel AI SDK]
+  AI -->|Generations| Client
+\`\`\``;
+      } else if (command === "explain") {
         simulatedResponse = `### 🔍 Code Explanation\n\nThis snippet provides the implementation logic:\n- **Structure**: Encapsulates data flow and returns the resolved result.\n- **Error Handling**: Recommended to wrap in try/catch to catch runtime exceptions.\n- **Performance**: O(n) linear operation with minimal memory footprint.\n\n> *Tip: Add \`GEMINI_API_KEY\` or \`OPENAI_API_KEY\` in your \`.env\` file for full live AI responses.*`;
       } else if (command === "test") {
         simulatedResponse = `### 🧪 Unit Tests (Vitest / Jest)\n\n\`\`\`typescript\nimport { describe, it, expect } from "vitest";\n\ndescribe("Component / Function Tests", () => {\n  it("should handle valid input correctly", () => {\n    const input = { id: "1", status: "active" };\n    expect(input.status).toBe("active");\n  });\n\n  it("should throw or handle error on invalid input", () => {\n    expect(() => {\n      throw new Error("Invalid payload");\n    }).toThrow("Invalid payload");\n  });\n});\n\`\`\`\n\n> *Tip: Add \`GEMINI_API_KEY\` or \`OPENAI_API_KEY\` to your \`.env\` for live model generation.*`;

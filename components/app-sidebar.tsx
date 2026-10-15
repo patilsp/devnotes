@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getNotebooks } from "@/server/notebooks";
 import { SidebarData } from "./sidebar-data";
+import { ChatNotesSidebarButton } from "./chat-notes-sidebar-button";
 import Link from "next/link";
 import { DevNotesLogo, DevNotesWordmark } from "./logo";
 
@@ -49,7 +50,8 @@ export async function AppSidebar({
         <SidebarData data={data} />
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-2.5">
+      <SidebarFooter className="border-t p-2 space-y-1">
+        <ChatNotesSidebarButton />
         <Link
           href="/dashboard"
           className="flex items-center justify-between text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1.5 rounded-md hover:bg-sidebar-accent"

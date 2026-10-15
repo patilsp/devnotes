@@ -20,7 +20,9 @@ import {
   Bug,
   TestTube,
   FileText,
+  Workflow,
 } from "lucide-react";
+import { MermaidViewer } from "@/components/mermaid-viewer";
 
 interface AIAssistantModalProps {
   open: boolean;
@@ -41,14 +43,15 @@ export function AIAssistantModal({
   const [loading, setLoading] = React.useState(false);
   const [result, setResult] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
+  const [viewRaw, setViewRaw] = React.useState(false);
   const [command, setCommand] = React.useState<
-    "generate" | "explain" | "fix" | "test" | "summarize"
+    "generate" | "explain" | "fix" | "test" | "summarize" | "diagram"
   >("generate");
 
   const activeContext = selectedText || fullNoteText;
 
   const handleGenerate = async (
-    overrideCommand?: "generate" | "explain" | "fix" | "test" | "summarize",
+    overrideCommand?: "generate" | "explain" | "fix" | "test" | "summarize" | "diagram",
     overridePrompt?: string
   ) => {
     const cmd = overrideCommand || command;
@@ -98,6 +101,14 @@ export function AIAssistantModal({
     }
   };
 
+  const isMermaid =
+    result &&
+    (result.includes("```mermaid") ||
+      result.includes("flowchart") ||
+      result.includes("sequenceDiagram") ||
+      result.includes("classDiagram") ||
+      result.includes("erDiagram"));
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-6 gap-4">
@@ -111,7 +122,7 @@ export function AIAssistantModal({
                 DevNotes AI Assistant
               </DialogTitle>
               <DialogDescription className="text-xs">
-                Generate code, explain concepts, review bugs, or summarize your
+                Generate code, diagrams, explain concepts, review bugs, or summarize your
                 notes with AI.
               </DialogDescription>
             </div>
@@ -129,6 +140,22 @@ export function AIAssistantModal({
           >
             <Wand2 className="size-3.5" />
             Generate
+          </Button>
+          <Button
+            type="button"
+            variant={command === "diagram" ? "default" : "outline"}
+            size="sm"
+            className="h-7 text-xs gap-1.5"
+            onClick={() => {
+              setCommand("diagram");
+              handleGenerate(
+                "diagram",
+                prompt || "Create an architecture flow diagram"
+              );
+            }}
+          >
+            <Workflow className="size-3.5" />
+            Diagram Architecture
           </Button>
           <Button
             type="button"
@@ -207,7 +234,9 @@ export function AIAssistantModal({
               }
             }}
             placeholder={
-              command === "explain"
+              command === "diagram"
+                ? "Describe system architecture or flow (e.g., 'OAuth 2.0 PKCE flow', 'Next.js App Router data flow')..."
+                : command === "explain"
                 ? "Ask a specific question about the snippet..."
                 : command === "fix"
                 ? "Any specific requirements or edge cases to consider?"
@@ -232,27 +261,50 @@ export function AIAssistantModal({
 
         {/* AI Output Result Box */}
         {result && (
-          <div className="flex-1 flex flex-col min-h-40 max-h-72 overflow-hidden rounded-md border bg-muted/30">
+          <div className="flex-1 flex flex-col min-h-40 max-h-80 overflow-hidden rounded-md border bg-muted/30">
             <div className="flex items-center justify-between px-3 py-1.5 border-b bg-muted/50 text-xs text-muted-foreground">
-              <span>AI Response</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleCopy}
-                className="h-6 px-2 text-xs gap-1"
-              >
-                {copied ? (
-                  <Check className="size-3 text-green-500" />
-                ) : (
-                  <Copy className="size-3" />
+              <span className="font-medium">
+                {isMermaid ? "Architecture Diagram" : "AI Response"}
+              </span>
+              <div className="flex items-center gap-2">
+                {isMermaid && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setViewRaw(!viewRaw)}
+                    className="h-6 px-2 text-xs"
+                  >
+                    {viewRaw ? "Preview Diagram" : "View Code"}
+                  </Button>
                 )}
-                {copied ? "Copied" : "Copy"}
-              </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopy}
+                  className="h-6 px-2 text-xs gap-1"
+                >
+                  {copied ? (
+                    <Check className="size-3 text-green-500" />
+                  ) : (
+                    <Copy className="size-3" />
+                  )}
+                  {copied ? "Copied" : "Copy"}
+                </Button>
+              </div>
             </div>
-            <div className="p-3 overflow-y-auto font-mono text-xs whitespace-pre-wrap leading-relaxed select-text flex-1">
-              {result}
+
+            <div className="p-3 overflow-y-auto flex-1">
+              {isMermaid && !viewRaw ? (
+                <MermaidViewer chart={result} className="my-0 border-0 p-0 shadow-none bg-transparent" />
+              ) : (
+                <div className="font-mono text-xs whitespace-pre-wrap leading-relaxed select-text">
+                  {result}
+                </div>
+              )}
             </div>
+
             <div className="flex items-center justify-end gap-2 p-2.5 border-t bg-card">
               {selectedText ? (
                 <Button
