@@ -10,6 +10,8 @@ import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { common, createLowlight } from "lowlight";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,6 +26,8 @@ import {
   Italic,
   Strikethrough,
   Code,
+  Code2,
+  Terminal,
   Underline,
   Link,
   List,
@@ -39,6 +43,22 @@ import {
 } from "lucide-react";
 import { updateNote } from "@/server/notes";
 
+const lowlight = createLowlight(common);
+
+const SUPPORTED_LANGUAGES = [
+  { label: "TypeScript", value: "typescript" },
+  { label: "JavaScript", value: "javascript" },
+  { label: "Python", value: "python" },
+  { label: "Bash / Shell", value: "bash" },
+  { label: "HTML", value: "html" },
+  { label: "CSS", value: "css" },
+  { label: "JSON", value: "json" },
+  { label: "SQL", value: "sql" },
+  { label: "Rust", value: "rust" },
+  { label: "Go", value: "go" },
+  { label: "Markdown", value: "markdown" },
+];
+
 interface RichTextEditorProps {
   content?: JSONContent[];
   noteId?: string;
@@ -46,7 +66,18 @@ interface RichTextEditorProps {
 
 const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
   const editor = useEditor({
-    extensions: [StarterKit, Document, Paragraph, Text],
+    extensions: [
+      StarterKit.configure({
+        codeBlock: false,
+      }),
+      CodeBlockLowlight.configure({
+        lowlight,
+        defaultLanguage: "typescript",
+      }),
+      Document,
+      Paragraph,
+      Text,
+    ],
     immediatelyRender: false,
     autofocus: true,
     editable: true,
@@ -304,6 +335,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         <Button
           variant="ghost"
           size="sm"
+          title="Inline Code"
           onClick={() => editor?.chain().focus().toggleCode().run()}
           disabled={!editorState?.canCode}
           className={`size-8 p-0 hover:bg-accent ${
@@ -314,6 +346,54 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         >
           <Code className="h-4 w-4" />
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          title="Code Block"
+          onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+          className={`size-8 p-0 hover:bg-accent ${
+            editorState?.isCodeBlock
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Code2 className="h-4 w-4" />
+        </Button>
+
+        {/* Code Block Language Selector */}
+        {editorState?.isCodeBlock && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2 text-xs gap-1 font-mono bg-background"
+              >
+                <Terminal className="h-3 w-3 text-primary" />
+                {editor?.getAttributes("codeBlock").language || "auto"}
+                <ChevronDown className="h-3 w-3 opacity-60" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-56 overflow-y-auto">
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.value}
+                  onClick={() =>
+                    editor
+                      ?.chain()
+                      .focus()
+                      .updateAttributes("codeBlock", { language: lang.value })
+                      .run()
+                  }
+                  className="text-xs font-mono"
+                >
+                  {lang.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
         <Button
           variant="ghost"
           size="sm"

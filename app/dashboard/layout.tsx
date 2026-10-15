@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import { CommandPalette } from "@/components/command-palette";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -21,6 +22,7 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
+      <CommandPalette />
       <Suspense fallback={<div>Loading...</div>}>
         <AppSidebar />
       </Suspense>
